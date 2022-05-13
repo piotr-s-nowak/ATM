@@ -36,5 +36,10 @@ class ATMachineTest {
     public void shouldThrowNullPointerExceptionWhenCurrencyIsNull() {
         assertThrows(NullPointerException.class, () -> new ATMachine(bank, null));
     }
+    
+    @Test
+    public void shouldThrowNullPointerExceptionWhenDepositIsNull() {
+        assertThrows(NullPointerException.class, () -> atMachine.setDeposit(null));
+    }
 
 }
