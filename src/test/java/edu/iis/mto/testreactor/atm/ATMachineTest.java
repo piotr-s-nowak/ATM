@@ -41,7 +41,7 @@ class ATMachineTest {
     public void shouldThrowNullPointerExceptionWhenDepositIsNull() {
         assertThrows(NullPointerException.class, () -> atMachine.setDeposit(null));
     }
-    
+
     @Test
     public void shouldThrowATMOperationExceptionWhenCurrencyIsUnavailable() {
         List<BanknotesPack> bankPack = List.of(
@@ -55,6 +55,20 @@ class ATMachineTest {
         ATMOperationException atmOperationException = assertThrows(ATMOperationException.class,
                 () -> atMachine.withdraw(anyPin, anyCard, anyMoney));
         assertEquals(ErrorCode.WRONG_CURRENCY, atmOperationException.getErrorCode());
+    }
+
+    @Test
+    public void shouldThrowATMOperationExceptionWhenAuthorizeFailed() throws AuthorizationException {
+        List<BanknotesPack> bankPack = List.of(
+                BanknotesPack.create(10, Banknote.PL_10),
+                BanknotesPack.create(10, Banknote.PL_20),
+                BanknotesPack.create(10, Banknote.PL_50),
+                BanknotesPack.create(10, Banknote.PL_500)
+        );
+        MoneyDeposit defaultDeposit = MoneyDeposit.create(Currency.getInstance("PLN"), bankPack);
+        atMachine.setDeposit(defaultDeposit);
+        doThrow(new AuthorizationException()).when(bank).autorize(anyString(), anyString());
+        assertThrows(ATMOperationException.class, () -> atMachine.withdraw(anyPin, anyCard, anyMoney));
     }
 
 }
